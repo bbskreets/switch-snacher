@@ -88,16 +88,16 @@ class Website:
 
                 self.price = price if price is not None else self.price
 
-            except Exception as e:
+            except Exception as e:ß
                 # print(f'Error: {e}... Retrying {30-tries} more times.')
-                if tries % 5 == 0:
-                    time.sleep(1)
-
-                elif tries == 30:
+                if tries == 30:
                     print(f'Error: {e}...')
 
+                elif tries % 10 == 0:
+                    time.sleep(5)
+
                 else:
-                    time.sleep(0.1)
+                    time.sleep(0.25)
 
                 tries += 1
 

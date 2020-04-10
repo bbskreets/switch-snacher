@@ -1,10 +1,10 @@
 import json
 import re
-
+import time
 import requests
 from bs4 import BeautifulSoup
 
-MAX_PRICE = 410
+MAX_PRICE = 400
 
 WEBSITE_TYPES = ('amazon', 'bestbuy', 'source')
 
@@ -72,21 +72,27 @@ class Website:
         return f'Site: {self.webtype} | In Stock: {self.instock} | Price: {self.price} | URL: {self.url}'
 
     def check(self):
-        try:
-            if self.webtype == 'amazon':
-                self.price = amazon_check(self)
-                self.instock = True
+        price = None
+        while price is None:
+            try:
+                if self.webtype == 'amazon':
+                    price = amazon_check(self)
+                    self.instock = True
 
-            elif self.webtype == 'source':
-                self.price, self.instock = source_check(self)
+                elif self.webtype == 'source':
+                    price, self.instock = source_check(self)
 
-            elif self.webtype == 'bestbuy':
-                self.price, self.instock = bestbuy_check(self)
+                elif self.webtype == 'bestbuy':
+                    price, self.instock = bestbuy_check(self)
 
-            if self.price is not None and self.instock:
-                self.valid = True if self.price < MAX_PRICE else False
-        except:
-            pass
+                self.price = price
+
+                if self.price is not None and self.instock:
+                    self.valid = True if self.price < MAX_PRICE else False
+
+            except Exception as e:
+                print(f'Error: {e}')
+
 
         return self.valid
 

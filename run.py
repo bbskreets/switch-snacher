@@ -44,4 +44,4 @@ while not found:
             else:
                 print(Fore.RED + str(website) + Fore.RESET)
 
-    time.sleep(4)
+    time.sleep(30)

@@ -43,5 +43,5 @@ while not found:
 
             else:
                 print(Fore.RED + str(website) + Fore.RESET)
-
-    time.sleep(30)
+    print(Fore.MAGENTA + 'Waiting 15 seconds...' + Fore.RESET)
+    time.sleep(15)

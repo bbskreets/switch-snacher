@@ -13,13 +13,13 @@ headers = {
     'scheme': 'https'}
 
 
-def amazon_check(Website):
+def amazon_check(website):
     """
 
-    :param Website: Website Class
+    :param website: Website Class
     :return: price(float)
     """
-    url = Website.url
+    url = website.url
     r = requests.get(url, headers=headers)
     soup = BeautifulSoup(r.text, 'lxml')
     price = re.search("\d+\.\d+", soup.find("span", {
@@ -27,13 +27,13 @@ def amazon_check(Website):
     return float(price)
 
 
-def source_check(Website):
+def source_check(website):
     """
 
-    :param Website:
+    :param website:
     :return: price(float), instock(boolean)
     """
-    url = Website.url
+    url = website.url
     r = requests.get(url, headers=headers)
     soup = BeautifulSoup(r.text, 'lxml')
     stock = soup.find("div", {"class": "availability-text in-stock aline"})
@@ -42,13 +42,13 @@ def source_check(Website):
     return float(price), instock
 
 
-def bestbuy_check(Website):
+def bestbuy_check(website):
     """
 
-    :param Website:
+    :param website:
     :return: price(float), instock(boolean)
     """
-    url = Website.url
+    url = website.url
     r = requests.get(url, headers=headers)
     soup = BeautifulSoup(r.text, 'lxml')
     stock = soup.find("svg", {"class": "green_2s2Rz icon_3u19d iconStyle_UHoBs icon_3qLg0"})

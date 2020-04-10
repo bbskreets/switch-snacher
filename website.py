@@ -4,7 +4,7 @@ import time
 import requests
 from bs4 import BeautifulSoup
 
-MAX_PRICE = 400
+MAX_PRICE = 410
 
 WEBSITE_TYPES = ('amazon', 'bestbuy', 'source')
 
@@ -73,7 +73,8 @@ class Website:
 
     def check(self):
         price = None
-        while price is None:
+        tries = 0
+        while price is None and tries <= 30:
             try:
                 if self.webtype == 'amazon':
                     price = amazon_check(self)
@@ -85,14 +86,23 @@ class Website:
                 elif self.webtype == 'bestbuy':
                     price, self.instock = bestbuy_check(self)
 
-                self.price = price
-
-                if self.price is not None and self.instock:
-                    self.valid = True if self.price < MAX_PRICE else False
+                self.price = price if price is not None else self.price
 
             except Exception as e:
-                print(f'Error: {e}')
+                # print(f'Error: {e}... Retrying {30-tries} more times.')
+                if tries % 5 == 0:
+                    time.sleep(1)
 
+                elif tries == 30:
+                    print(f'Error: {e}...')
+
+                else:
+                    time.sleep(0.1)
+
+                tries += 1
+
+        if self.price is not None and self.instock:
+            self.valid = True if self.price < MAX_PRICE else False
 
         return self.valid
 

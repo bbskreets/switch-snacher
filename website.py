@@ -3,13 +3,20 @@ import re
 import time
 import requests
 from bs4 import BeautifulSoup
+import random
+from colorama import Fore
+
 
 MAX_PRICE = 410
 
+
 WEBSITE_TYPES = ('amazon', 'bestbuy', 'source')
+with open('user-agents.txt', 'r') as fh:
+    agents = [agent.replace('\n', '') for agent in fh.readlines()]
+
 
 headers = {
-    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36',
+    'user-agent': '',
     'scheme': 'https'}
 
 
@@ -72,37 +79,31 @@ class Website:
         return f'Site: {self.webtype} | In Stock: {self.instock} | Price: {self.price} | URL: {self.url}'
 
     def check(self):
-        price = None
-        tries = 0
-        while price is None and tries <= 30:
+        while self.valid is not True:
+            headers['user-agent'] = agents.pop(0)
+            agents.append(headers['user-agent'])
             try:
                 if self.webtype == 'amazon':
-                    price = amazon_check(self)
+                    self.price = amazon_check(self)
                     self.instock = True
 
                 elif self.webtype == 'source':
-                    price, self.instock = source_check(self)
+                    self.price, self.instock = source_check(self)
 
                 elif self.webtype == 'bestbuy':
-                    price, self.instock = bestbuy_check(self)
+                    self.price, self.instock = bestbuy_check(self)
 
-                self.price = price if price is not None else self.price
+                if self.price is not None and self.instock:
+                    self.valid = True if self.price < MAX_PRICE else False
 
-            except Exception as e:ß
-                # print(f'Error: {e}... Retrying {30-tries} more times.')
-                if tries == 30:
-                    print(f'Error: {e}...')
+                print(Fore.RED + str(self) + Fore.RESET)
 
-                elif tries % 10 == 0:
-                    time.sleep(5)
+            except Exception as e:
+                print(f'Error: {e}...')
 
-                else:
-                    time.sleep(0.25)
-
-                tries += 1
-
-        if self.price is not None and self.instock:
-            self.valid = True if self.price < MAX_PRICE else False
+            sleep_time = 1
+            time.sleep(sleep_time)
+            print(Fore.MAGENTA + f'Waiting {sleep_time} sec' + Fore.RESET)
 
         return self.valid
 

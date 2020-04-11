@@ -101,9 +101,7 @@ class Website:
             except Exception as e:
                 print(f'Error: {e}...')
 
-            sleep_time = 1
-            time.sleep(sleep_time)
-            print(Fore.MAGENTA + f'Waiting {sleep_time} sec' + Fore.RESET)
+            time.sleep(2)
 
         return self.valid
 
